@@ -63,6 +63,7 @@ a. `order_points(pts)`: Orders four points consistently for perspective transfor
 
 b. `four_point_transform(image, pts)`: Straightens the rectangle using perspective transform.
 
+c. `is_rectangle`: checks if 4 points contours  is rectangle 
 ---
 
 ### Approach / Methodology
