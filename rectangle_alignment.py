@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-
+import os
 def order_points(pts):
     rect = np.zeros((4, 2), dtype="float32")
     s = pts.sum(axis=1)
@@ -30,7 +30,7 @@ def four_point_transform(image, pts):
     warped = cv2.warpPerspective(image, M, (maxWidth, maxHeight))
     return warped
 
-
+#put path of ur input image here
 image = cv2.imread('image.png')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 _, thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
@@ -48,11 +48,14 @@ for contour in contours:
             warped = cv2.rotate(warped, cv2.ROTATE_90_CLOCKWISE)
         aligned_rectangles.append(warped)
 
+output_dir = 'task2-output'
+os.makedirs(output_dir, exist_ok=True)
 
 for i, rect_img in enumerate(aligned_rectangles):
-    cv2.imwrite(f'aligned_rectangle_{i+1}.png', rect_img)
+    filename = f'rectangle_{i+1}.png'
+    cv2.imwrite(os.path.join(output_dir, filename), rect_img)
     plt.figure()
-    plt.title(f'Aligned Rectangle {i+1}')
+    plt.title(f'Rectangle {i+1}')
     plt.imshow(cv2.cvtColor(rect_img, cv2.COLOR_BGR2RGB))
     plt.axis('off')
 

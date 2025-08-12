@@ -2,7 +2,7 @@ import cv2
 import matplotlib.pyplot as plt
 from math import hypot
 from itertools import combinations
-
+import os
 #this is to calculate distance between points
 def max_distance(points):
     pts = points.reshape(-1, 2)
@@ -50,7 +50,11 @@ def draw_lines_and_numbers(img, contours, lines_inside, line_nums):
 
 
 
-img = cv2.imread('triangle.png')
+#put the path of ur input image here
+img = cv2.imread('image.png')
+
+
+
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 _, thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
 contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -63,6 +67,10 @@ draw_lines_and_numbers(output, contours, lines_inside, line_nums)
 
 
 plt.imshow(cv2.cvtColor(output, cv2.COLOR_BGR2RGB))
-cv2.imwrite('output_image.png', output)
+
+output_dir = 'task1-output'
+os.makedirs(output_dir, exist_ok=True)
+cv2.imwrite(os.path.join(output_dir, 'output_image.png'), output)
+
 plt.axis('off')
 plt.show()
