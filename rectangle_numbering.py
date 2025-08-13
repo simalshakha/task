@@ -5,7 +5,7 @@ from itertools import combinations
 import os
 import numpy as np
 
-# --- helper functions ---
+
 def max_distance(points):
     pts = points.reshape(-1, 2)
     max_d = 0
