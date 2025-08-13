@@ -5,7 +5,7 @@ from itertools import combinations
 import os
 import numpy as np
 
-# this is to calculate distance between points
+# --- helper functions ---
 def max_distance(points):
     pts = points.reshape(-1, 2)
     max_d = 0
@@ -15,25 +15,21 @@ def max_distance(points):
             max_d = dist
     return max_d
 
-# Calculate angle between vectors pt0->pt1 and pt0->pt2
 def angle(pt1, pt2, pt0):
     dx1 = pt1[0] - pt0[0]
     dy1 = pt1[1] - pt0[1]
     dx2 = pt2[0] - pt0[0]
     dy2 = pt2[1] - pt0[1]
-    # dot product and magnitude
     dot = dx1 * dx2 + dy1 * dy2
     mag1 = np.sqrt(dx1*dx1 + dy1*dy1)
     mag2 = np.sqrt(dx2*dx2 + dy2*dy2)
     if mag1 * mag2 == 0:
         return 0
     cos_angle = dot / (mag1 * mag2)
-    # Clamp cos_angle to [-1, 1] to avoid numerical errors
     cos_angle = max(min(cos_angle, 1), -1)
     ang = np.arccos(cos_angle) * 180 / np.pi
     return ang
 
-# Check if approx polygon is rectangle by verifying all angles ~90 degrees
 def is_rectangle(approx, max_deviation=10):
     if len(approx) != 4:
         return False
@@ -46,7 +42,6 @@ def is_rectangle(approx, max_deviation=10):
             return False
     return True
 
-# find only rectangles
 def find_rectangles(contours):
     rects_found = []
     for i, cnt in enumerate(contours):
@@ -56,34 +51,39 @@ def find_rectangles(contours):
             rects_found.append((x, y, w, h, i))
     return rects_found
 
-# find lines which are inside the rectangle and sort them based on their length
+
+import numpy as np
+import cv2
+
+import numpy as np
+import cv2
+
+
 def find_and_number_lines_inside(contours, hierarchy, rects):
     lines_inside = []
     for i, cnt in enumerate(contours):
-        parent_idx = hierarchy[0][i][3] 
-        first_child = hierarchy[0][i][2]  
+        parent_idx = hierarchy[0][i][3]
+        first_child = hierarchy[0][i][2]
         if parent_idx != -1 and first_child == -1:
             lx, ly, lw, lh = cv2.boundingRect(cnt)
             for rx, ry, rw, rh, ridx in rects:
-                if rx < lx and ry < ly and (lx + lw) < (rx + rw) and (ly + lh) < (ry + rh):
+                inside_rect = rx < lx and ry < ly and (lx + lw) < (rx + rw) and (ly + lh) < (ry + rh)
+                if inside_rect:
                     dist = max_distance(cnt)
                     lines_inside.append((dist, i))
-                    break  
-    
+                    break
     lines_inside.sort(key=lambda x: x[0])
     line_nums = {idx: n+1 for n, (_, idx) in enumerate(lines_inside)}
     return lines_inside, line_nums
 
-# drawing and assigning numbers to line according to their length
 def draw_lines_and_numbers(img, contours, lines_inside, line_nums):
     for dist, idx in lines_inside:
         cv2.drawContours(img, [contours[idx]], -1, (255, 0, 0), 2)
-        pt = tuple(contours[idx][0][0])  
+        pt = tuple(contours[idx][0][0])
         cv2.putText(img, str(line_nums[idx]), pt, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
 
-# put the path of your input image here
-img = cv2.imread('image.png')
 
+img = cv2.imread('image.png')
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 _, thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
 contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)

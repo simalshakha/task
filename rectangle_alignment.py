@@ -5,7 +5,6 @@ import os
 
 # Function to check if a polygon is rectangle
 def angle_between(p1, p2, p3):
-    """Calculate angle at p2 formed by points p1-p2-p3"""
     v1 = p1 - p2
     v2 = p3 - p2
     cosine_angle = np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
@@ -13,7 +12,6 @@ def angle_between(p1, p2, p3):
     return np.degrees(angle)
 
 def is_rectangle(pts, angle_tolerance=10):
-    """Check if 4 points form a rectangle"""
     pts = pts.reshape(4, 2)
     for i in range(4):
         p1 = pts[i]
@@ -36,23 +34,17 @@ rectangles = []
 for contour in contours:
     epsilon = 0.02 * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
-    
     if len(approx) == 4 and is_rectangle(approx):
-        
         rect = cv2.minAreaRect(approx)
         box = cv2.boxPoints(rect)
         box = np.int0(box)
-        
         W = int(rect[1][0])
         H = int(rect[1][1])
         center = (int(rect[0][0]), int(rect[0][1]))
         angle = rect[2]
-
         if W < H:
             angle += 90
             W, H = H, W  #
-        
-
         M = cv2.getRotationMatrix2D(center, angle, 1.0)
         rotated = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
         x, y = int(center[0] - W/2), int(center[1] - H/2)
