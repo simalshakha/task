@@ -78,20 +78,17 @@ def find_and_number_lines_inside(contours, hierarchy, rects):
 
 def draw_lines_and_numbers_below(img, contours, lines_inside, line_nums, rects):
     for rx, ry, rw, rh, ridx in rects:
-        # Collect line indices inside this rectangle
         inside_lines = [idx for _, idx in lines_inside if 
                         rx < cv2.boundingRect(contours[idx])[0] and
                         ry < cv2.boundingRect(contours[idx])[1] and
                         (cv2.boundingRect(contours[idx])[0] + cv2.boundingRect(contours[idx])[2]) < (rx + rw) and
                         (cv2.boundingRect(contours[idx])[1] + cv2.boundingRect(contours[idx])[3]) < (ry + rh)]
         for idx in inside_lines:
-            # Draw the line itself
             cv2.drawContours(img, [contours[idx]], -1, (255, 0, 0), 2)
-            # Draw number below the rectangle
             text = str(line_nums[idx])
             text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
-            text_x = rx + (rw - text_size[0]) // 2  # center horizontally
-            text_y = ry + rh + text_size[1] + 5      # slightly below rectangle
+            text_x = rx + (rw - text_size[0]) // 2  
+            text_y = ry + rh + text_size[1] + 5      
             cv2.putText(img, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
 
 
