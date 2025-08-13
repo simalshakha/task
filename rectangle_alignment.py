@@ -25,26 +25,18 @@ def is_rectangle(pts, angle_tolerance=10):
     return True
 
 # Load image
-image = cv2.imread('test.png')
+image = cv2.imread('image.png')
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
 _, thresh = cv2.threshold(gray, 200, 255, cv2.THRESH_BINARY_INV)
-
-
 contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-
 output_dir = 'task2-output'
 os.makedirs(output_dir, exist_ok=True)
-
 rectangles = []
 
 for contour in contours:
-  
     epsilon = 0.02 * cv2.arcLength(contour, True)
     approx = cv2.approxPolyDP(contour, epsilon, True)
     
-  
     if len(approx) == 4 and is_rectangle(approx):
         
         rect = cv2.minAreaRect(approx)
@@ -55,8 +47,7 @@ for contour in contours:
         H = int(rect[1][1])
         center = (int(rect[0][0]), int(rect[0][1]))
         angle = rect[2]
-        
-        # Correct rotation if needed
+
         if W < H:
             angle += 90
             W, H = H, W  #
@@ -64,8 +55,6 @@ for contour in contours:
 
         M = cv2.getRotationMatrix2D(center, angle, 1.0)
         rotated = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]))
-        
-        # Crop upright rectangle
         x, y = int(center[0] - W/2), int(center[1] - H/2)
         cropped = rotated[y:y+H, x:x+W]
         rectangles.append(cropped)
