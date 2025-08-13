@@ -52,11 +52,6 @@ def find_rectangles(contours):
     return rects_found
 
 
-import numpy as np
-import cv2
-
-import numpy as np
-import cv2
 
 
 def find_and_number_lines_inside(contours, hierarchy, rects):
