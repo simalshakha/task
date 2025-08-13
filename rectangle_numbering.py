@@ -76,11 +76,23 @@ def find_and_number_lines_inside(contours, hierarchy, rects):
     line_nums = {idx: n+1 for n, (_, idx) in enumerate(lines_inside)}
     return lines_inside, line_nums
 
-def draw_lines_and_numbers(img, contours, lines_inside, line_nums):
-    for dist, idx in lines_inside:
-        cv2.drawContours(img, [contours[idx]], -1, (255, 0, 0), 2)
-        pt = tuple(contours[idx][0][0])
-        cv2.putText(img, str(line_nums[idx]), pt, cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
+def draw_lines_and_numbers_below(img, contours, lines_inside, line_nums, rects):
+    for rx, ry, rw, rh, ridx in rects:
+        # Collect line indices inside this rectangle
+        inside_lines = [idx for _, idx in lines_inside if 
+                        rx < cv2.boundingRect(contours[idx])[0] and
+                        ry < cv2.boundingRect(contours[idx])[1] and
+                        (cv2.boundingRect(contours[idx])[0] + cv2.boundingRect(contours[idx])[2]) < (rx + rw) and
+                        (cv2.boundingRect(contours[idx])[1] + cv2.boundingRect(contours[idx])[3]) < (ry + rh)]
+        for idx in inside_lines:
+            # Draw the line itself
+            cv2.drawContours(img, [contours[idx]], -1, (255, 0, 0), 2)
+            # Draw number below the rectangle
+            text = str(line_nums[idx])
+            text_size = cv2.getTextSize(text, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0]
+            text_x = rx + (rw - text_size[0]) // 2  # center horizontally
+            text_y = ry + rh + text_size[1] + 5      # slightly below rectangle
+            cv2.putText(img, text, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 255), 2)
 
 
 img = cv2.imread('image.png')
@@ -91,7 +103,8 @@ output = img.copy()
 
 rects = find_rectangles(contours)
 lines_inside, line_nums = find_and_number_lines_inside(contours, hierarchy, rects)
-draw_lines_and_numbers(output, contours, lines_inside, line_nums)
+draw_lines_and_numbers_below(output, contours, lines_inside, line_nums, rects)
+
 
 plt.imshow(cv2.cvtColor(output, cv2.COLOR_BGR2RGB))
 plt.axis('off')
