@@ -59,11 +59,9 @@ d. `draw_lines_and_numbers(img, contours, lines_inside, line_nums)`: Draws line 
 
 #### 2. Rectangle Alignment and Extraction
 
-a. `order_points(pts)`: Orders four points consistently for perspective transform.
 
-b. `four_point_transform(image, pts)`: Straightens the rectangle using perspective transform.
 
-c. `is_rectangle`: checks if 4 points contours  is rectangle 
+a. `is_rectangle`: checks if 4 points contours  is rectangle 
 ---
 
 ### Approach / Methodology
@@ -78,14 +76,8 @@ c. `is_rectangle`: checks if 4 points contours  is rectangle
 
 #### Rectangle Alignment and Extraction
 
-- Converted images to grayscale and applied thresholding to separate shapes from background.
+initial I used four_point_transform methord  to extract all four point contours then i realize this methord was done to transform all four point contours to a rectangle. so,finally i Verified rectangles with is_rectangle + rotated upright using minAreaRect → simpler, precise, and straightened rectangle extraction.
 
-- Used contour detection to find shapes, approximating polygons and filtering for quadrilaterals (4-point contours) as candidate rectangles.
 
-- Applied perspective transform to straighten each detected rectangle, correcting any tilt or rotation.
-
-- Checked rectangle dimensions and rotated those with width greater than height by 90 degrees to ensure vertical (portrait) orientation.
-
-- Extracted and saved each aligned rectangle as an individual image for further processing or analysis.
 
 
